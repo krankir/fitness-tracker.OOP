@@ -1,16 +1,15 @@
-from typing import Dict, List
+from typing import Dict, List, Type
+from dataclasses import dataclass
 
 
+@dataclass
 class InfoMessage:
     """Информационное сообщение о тренировке."""
-
-    def __init__(self, training_type: str, duration: float, distance: float,
-                 speed: float, calories: float) -> None:
-        self.training_type = training_type
-        self.duration = duration
-        self.distance = distance
-        self.speed = speed
-        self.calories = calories
+    training_type: str
+    duration: float
+    distance: float
+    speed: float
+    calories: float
 
     def get_message(self) -> str:
         """Возвращает строку сообщения."""
@@ -47,7 +46,7 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        pass
+        raise NotImplementedError
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -119,11 +118,13 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: List) -> Training:
     """Прочитать данные полученные от датчиков."""
-    dict_training: Dict[str, Training] = {
+    dict_training: Dict[str, Type[Training]] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking}
     type_training = dict_training[workout_type](*data)
+    if dict_training.get(workout_type) in dict_training:
+        raise AttributeError('неверный вид тренировки')
     return type_training
 
 
